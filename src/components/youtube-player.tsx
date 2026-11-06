@@ -7,8 +7,8 @@ type YouTubePlayer = {
   playVideo(): void; pauseVideo(): void; destroy(): void;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
   setVolume(volume: number): void; setPlaybackRate(rate: number): void;
-  getPlaybackRate(): number; getAvailablePlaybackRates(): number[];
-  getCurrentTime(): number; getDuration(): number;
+  getAvailablePlaybackRates(): number[] | undefined;
+  getCurrentTime(): number | undefined; getDuration(): number | undefined;
   loadVideoById(options: { videoId: string; startSeconds: number; endSeconds?: number }): void;
   cueVideoById(options: { videoId: string; startSeconds: number; endSeconds?: number }): void;
 };
@@ -67,8 +67,9 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
       if (playing.current) player.current.pauseVideo();
       else {
         const track = live.current.track;
-        const time = player.current.getCurrentTime();
-        if (track && (time < track.start || (track.end !== null && time >= track.end - 0.1) || time >= player.current.getDuration() - 0.1)) player.current.seekTo(track.start, true);
+        const time = player.current.getCurrentTime() ?? 0;
+        const duration = player.current.getDuration() ?? 0;
+        if (track && (time < track.start || (track.end !== null && time >= track.end - 0.1) || (duration > 0 && time >= duration - 0.1))) player.current.seekTo(track.start, true);
         ended.current = false;
         player.current.playVideo();
       }
@@ -76,7 +77,7 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
     seek(seconds) {
       const track = live.current.track;
       if (ready && player.current && track) {
-        const end = track.end ?? player.current.getDuration();
+        const end = track.end ?? player.current.getDuration() ?? 0;
         player.current.seekTo(Math.max(track.start, Math.min(seconds, end > 0 ? end - 0.1 : seconds)), true);
         ended.current = false;
       }
@@ -107,10 +108,10 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
               const current = player.current;
               const track = live.current.track;
               if (current && track) {
-                const rates = current.getAvailablePlaybackRates();
+                const rates = current.getAvailablePlaybackRates() ?? [];
                 if (rates.includes(track.speed)) current.setPlaybackRate(track.speed);
                 else if (rates.length) setError(`This video does not support ${track.speed}× speed. Choose another speed.`);
-                const duration = current.getDuration();
+                const duration = current.getDuration() ?? 0;
                 if (duration > 0 && duration <= 86400) live.current.onDuration(duration);
               }
             }
@@ -148,8 +149,8 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
       const current = player.current;
       const track = live.current.track;
       if (!current || !track || typeof current.getCurrentTime !== "function") return;
-      const time = current.getCurrentTime();
-      const duration = current.getDuration();
+      const time = current.getCurrentTime() ?? track.start;
+      const duration = current.getDuration() ?? 0;
       live.current.onProgress(time, duration);
       if (playing.current && time < track.start - 0.5) current.seekTo(track.start, true);
       if (playing.current && track.end !== null && time >= track.end - 0.1) finish();
@@ -179,7 +180,7 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
   useEffect(() => {
     if (!ready || !player.current || !props.track) return;
     const desired = props.track.speed;
-    const rates = player.current.getAvailablePlaybackRates();
+    const rates = player.current.getAvailablePlaybackRates() ?? [];
     if (rates.length && !rates.includes(desired)) {
       setError(`This video does not support ${desired}× speed. Choose another speed or use the YouTube controls.`);
       return;
@@ -194,6 +195,7 @@ export const YouTubePlayer = forwardRef<PlayerHandle, Props>(function YouTubePla
   return <div className="youtube-shell">
     {!hasTrack && <div className="player-placeholder"><span className="placeholder-disc" /><p>A moment worth playing.</p><small>Choose a track to start listening.</small></div>}
     <div className={hasTrack ? "youtube-frame" : "youtube-frame empty"} ref={host} />
+    {hasTrack && !ready && !error && <div className="player-connecting" role="status">Connecting to YouTube…</div>}
     {error && <div className="player-error" role="alert"><p>{error}</p><button className="text-button" onClick={() => setRetry((value) => value + 1)}>Retry player</button></div>}
   </div>;
 });
