@@ -35,6 +35,7 @@ Videos stream directly from YouTube and require internet access. Availability, e
 ```sh
 npm test
 npm run typecheck
+npm run format:check
 npm run build
 npm start
 ```
@@ -43,11 +44,11 @@ Tests cover video URL validation, timestamp boundaries, backup round trips and c
 
 ## Project structure
 
-| Path | Purpose |
-| --- | --- |
-| `src/components/music-app.tsx` | Library interface, queue, and playback controls |
-| `src/components/youtube-player.tsx` | YouTube API lifecycle and segment playback |
-| `src/components/dialogs.tsx` | Playlist, track import, and snippet forms |
-| `src/lib/library.ts` | Data model, starter library, validation, and timestamps |
-| `src/lib/use-library.ts` | Local persistence and storage error handling |
-| `src/app/api/youtube/route.ts` | Validated, cached YouTube metadata lookup |
+| Path                                | Purpose                                                 |
+| ----------------------------------- | ------------------------------------------------------- |
+| `src/components/music-app.tsx`      | Library interface, queue, and playback controls         |
+| `src/components/youtube-player.tsx` | YouTube API lifecycle and segment playback              |
+| `src/components/dialogs.tsx`        | Playlist, track import, and snippet forms               |
+| `src/lib/library.ts`                | Data model, starter library, validation, and timestamps |
+| `src/lib/use-library.ts`            | Local persistence and storage error handling            |
+| `src/app/api/youtube/route.ts`      | Validated, cached YouTube metadata lookup               |
