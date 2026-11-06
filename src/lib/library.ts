@@ -20,7 +20,7 @@ export const CATALOG: Track[] = [
   { id: "blinding-lights", videoId: "4NRXx6U8ABQ", title: "Blinding Lights", artist: "The Weeknd", duration: null, start: 0, end: null, speed: 1 },
   { id: "less-i-know", videoId: "2SUwOgmvzK4", title: "The Less I Know The Better", artist: "Tame Impala", duration: null, start: 0, end: null, speed: 1 },
   { id: "a-moment-apart", videoId: "xarC5jAiO7w", title: "A Moment Apart", artist: "ODESZA", duration: null, start: 0, end: null, speed: 1 },
-  { id: "awake", videoId: "Z6ih1a-KEtU", title: "Awake", artist: "Tycho", duration: null, start: 0, end: null, speed: 1 },
+  { id: "awake", videoId: "dm4tkSNKfFI", title: "Awake", artist: "Tycho", duration: null, start: 0, end: null, speed: 1 },
 ];
 
 export function createLibrary(): Library {
